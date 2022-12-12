@@ -28,6 +28,25 @@ module.exports.getNotesController = async(req, res) => {
 	}
 }
 
+// get single note
+module.exports.getNoteController = 	async(req, res) => {
+	let id = req.params.id;
+	const errors = validationResult(req);
+	if(!errors.isEmpty()){
+		return res.status(404).send(errors.array());
+	}
+	try{
+		const note = await Note.findById(id);
+		if(!note) return res.status(404).send('No note found');
+		return res.send(note);
+	}catch(error){
+		return res.status(500).send(error);
+	}
+
+
+}
+
+
 // update note
 module.exports.updateNoteController = async(req, res) => {
 	const id = req.params.id;
