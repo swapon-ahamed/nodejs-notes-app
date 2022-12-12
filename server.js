@@ -6,6 +6,9 @@ const {check, validationResult} = require('express-validator');
 // models
 const Note = require('./models/notes');
 
+// controller
+const {addNoteController,getNotesController,updateNoteController,deleteNoteController} = require("./controllers/noteController");
+
 // middleware
 app.use(express.json());
 
@@ -19,25 +22,10 @@ mongoose.set('strictQuery', false);
 
 
 //home page
-app.get("/", async(req, res) => {
-	// res.send(notes);
-	try{
-		const notes = await Note.find();
-		res.send(notes);
-	}catch(error){
-		res.status(500).send(error);
-	}
-});
+app.get("/", getNotesController);
 
 // get for all notes
-app.get("/notes", async(req, res) => {
-	try{
-		const notes = await Note.find();
-		res.send(notes);
-	}catch(error){
-		res.status(500).send(error);
-	}
-});
+app.get("/notes",getNotesController);
 
 // for single note
 app.get('/notes/:id', 
@@ -69,22 +57,9 @@ app.post('/note',
 		check('title', 'Title is rquired').notEmpty(),
 		check('description', 'description is rquired').notEmpty()
 	],
-	async(req, res) => {
-		const errors = validationResult(req);
-		const note =  new Note(req.body);
-		if(!errors.isEmpty()){
-			return res.status(400).send({errors: errors.array()})
-		}
-		try{
-			await note.save();
-			res.send(note);
-		}catch(err){
-			console.log(err)
-			res.status(400).send(err);
-		}
-});
-
-
+	// controller
+	addNoteController
+	);
 // update notes
 app.put('/note/:id', 
 [
@@ -92,48 +67,14 @@ app.put('/note/:id',
 	check('title', 'Title is rquired').notEmpty(),
 	check('description', 'description is rquired').optional().notEmpty()
 ],
-
-async(req, res) => {
-	const id = req.params.id;
-	let dataKeys = Object.keys( req.body);
-	let allowedDataKey = ['title', 'description'];
-	let isValid  = dataKeys.every(key => allowedDataKey.includes(key));
-	if(!isValid) return res.status(400).send('Invalid update');
-		const errors = validationResult(req);
-		if(!errors.isEmpty()){
-			return res.status(400).send({errors: errors.array()})
-		}
-	try{
-		const note = await Note.findByIdAndUpdate(id, req.body, {
-			new: true,
-			runValidators: true
-		});
-		if(!note) return res.status(404).send('Note not found');
-		res.send(note);
-	}catch(error){
-		res.status(500).send(error);
-	}
-});
+updateNoteController
+);
 
 // delete note
 app.delete('/note/:id', 
 	check('id', 'Note not found').isMongoId(),
-
-	async (req, res) => {
-	let id = req.params.id;
-	const errors = validationResult(req);
-	if(!errors.isEmpty()){
-		return res.status(400).send({errors: errors.array()})
-	}
-	const note = await Note.findByIdAndDelete(id);
-	if(!note){
-		//delete
-		res.status(404).send('404 Not Found.');
-	}else{
-		res.send(note);
-	}
-});
-
+	deleteNoteController
+);
 
 app.get('*', (req, res) => {
 	res.status(404).send("404 not found")
