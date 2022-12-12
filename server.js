@@ -18,32 +18,6 @@ mongoose.connect('mongodb://localhost:27017/notes-app',{
 mongoose.set('strictQuery', false);
 
 
-
-
-
-// var notes = [
-// 	{
-// 		id:1,
-// 		title: "Note one",
-// 		description: "Note one descriptions."
-// 	},
-// 	{
-// 		id:2,
-// 		title: "Note two",
-// 		description: "Note two descriptions."
-// 	},
-// 	{
-// 		id:3,
-// 		title: "Note three",
-// 		description: "Note two descriptions."
-// 	},
-// 	{
-// 		id:4,
-// 		title: "Note four",
-// 		description: "Note two descriptions."
-// 	}
-// ];
-
 //home page
 app.get("/", async(req, res) => {
 	// res.send(notes);
@@ -63,7 +37,6 @@ app.get("/notes", async(req, res) => {
 	}catch(error){
 		res.status(500).send(error);
 	}
-
 });
 
 // for single note
@@ -84,11 +57,7 @@ app.get('/notes/:id',
 	}catch(error){
 		return res.status(500).send(error);
 	}
-	// if(note){
-	// 	res.send(note);
-	// }else{
-	// 	res.status(404).send(`Not found note ID:${id}`);
-	// }
+
 
 });
 
@@ -113,7 +82,6 @@ app.post('/note',
 			console.log(err)
 			res.status(400).send(err);
 		}
-
 });
 
 
@@ -126,7 +94,6 @@ app.put('/note/:id',
 ],
 
 async(req, res) => {
-
 	const id = req.params.id;
 	let dataKeys = Object.keys( req.body);
 	let allowedDataKey = ['title', 'description'];
@@ -136,7 +103,6 @@ async(req, res) => {
 		if(!errors.isEmpty()){
 			return res.status(400).send({errors: errors.array()})
 		}
-
 	try{
 		const note = await Note.findByIdAndUpdate(id, req.body, {
 			new: true,
@@ -147,49 +113,26 @@ async(req, res) => {
 	}catch(error){
 		res.status(500).send(error);
 	}
-
-
-
-	// let allowedDataKey = ['title', 'description'];
-	// let id = req.params.id;
-	// let noteData = req.body;
-	// let dataKeys = Object.keys(noteData);
-	// let isValid  = dataKeys.every(key => allowedDataKey.includes(key));
-	// if(isValid){
-	// 	const note = notes.find(note => note.id === id);
-	// 	if(note){
-	// 		notes = notes.map(note => {
-	// 			if(note.id === id){
-	// 				return {
-	// 					...note,
-	// 					...noteData
-	// 				}
-	// 			}else{
-	// 				return note;
-	// 			}
-	// 		});
-	// 			res.status(200).send(notes);
-	// 	}else{
-	// 		res.status(404).send("404 Not found");
-	// 	}
-	// }else{
-	// 	res.status(500).send("Invalid data");
-	// }
 });
 
 // delete note
-app.delete('/note/:id', (req, res) => {
-	let id = parseInt(req.params.id);
-	const note = notes.find(note => note.id === id);
-	if(note){
+app.delete('/note/:id', 
+	check('id', 'Note not found').isMongoId(),
+
+	async (req, res) => {
+	let id = req.params.id;
+	const errors = validationResult(req);
+	if(!errors.isEmpty()){
+		return res.status(400).send({errors: errors.array()})
+	}
+	const note = await Note.findByIdAndDelete(id);
+	if(!note){
 		//delete
-		notes = notes.filter(note => note.id !== id);
-		res.send(notes);
-	}else{
 		res.status(404).send('404 Not Found.');
+	}else{
+		res.send(note);
 	}
 });
-
 
 
 app.get('*', (req, res) => {
