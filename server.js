@@ -10,8 +10,9 @@ const Note = require('./models/notes');
 app.use(express.json());
 
 // Route
+const indexRoute = require('./routes/index');
 const notesRoute = require('./routes/notes');
-
+const usersRoute = require('./routes/users');
 
 // connecting database
 mongoose.connect('mongodb://localhost:27017/notes-app',{
@@ -23,9 +24,9 @@ mongoose.set('strictQuery', false);
 
 
 // Handling routes
-app.use('/', notesRoute);
+app.use('/', indexRoute);
 app.use('/notes', notesRoute);
-app.use('/note', notesRoute);
+app.use('/users', usersRoute);
 
 
 app.get('*', (req, res) => {

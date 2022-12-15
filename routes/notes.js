@@ -3,10 +3,10 @@ const router = express.Router();
 const {addNoteController,getNoteController,getNotesController,updateNoteController,deleteNoteController} = require("../controllers/noteController");
 const {check} = require('express-validator');
 //home page
-router.get("/", getNotesController);
+// router.get("/", getNotesController);
 
 // get for all notes
-router.get("/",getNotesController);
+// router.get("/",getNotesController);
 
 // for single note
 router.get('/:id', 
