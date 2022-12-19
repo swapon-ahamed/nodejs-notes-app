@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const {check} = require('express-validator');
-const {addUserController,getAllUserController} = require('../controllers/userController');
+const {addUserController,getAllUserController,getUserController,updateUserController,deleteUserController} = require('../controllers/userController');
 
+// get all users
 router.get('/', getAllUserController);
+
+// get single user
+router.get('/:id', getUserController);
 
 router.post('/', 
     [
@@ -27,4 +31,22 @@ router.post('/',
     ],
     addUserController
 );
+
+// update users
+router.put('/:id', 
+[
+	check('id','Not found note').isMongoId(),
+	check('firstName', 'first name is rquired').optional().notEmpty(),
+	check('lastName', 'last name is rquired').optional().notEmpty()
+],
+updateUserController
+);
+
+// delete user
+router.delete('/:id', 
+	check('id', 'Note not found').isMongoId(),
+	deleteUserController
+);
+
+
 module.exports = router;
