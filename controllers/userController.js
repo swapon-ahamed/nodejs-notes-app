@@ -20,7 +20,7 @@ module.exports.addUserController = async(req, res) => {
 // get all user 
 module.exports.getAllUserController = async(req, res) => {
     try{
-        const users = await User.find();
+        const users = await User.find({},['-password']);
         res.send(users);
     }catch(err){
         res.status(500).send("Internal server error");
@@ -32,7 +32,7 @@ module.exports.getAllUserController = async(req, res) => {
 module.exports.getUserController = async(req, res) => {
     try{
         const id = req.params.id;
-        const users = await User.findByIdAndUpdate(id, req.body);
+        const users = await User.findById(id, ['-password']);
         if(!users) return res.status(404).send('User ID not found');
         res.send(users);
     }catch(err){
