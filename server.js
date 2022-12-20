@@ -2,12 +2,14 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const {validationResult} = require('express-validator');
+const cookieParser = require('cookie-parser');
 
 // models
 const Note = require('./models/notes');
 
 // middleware
 app.use(express.json());
+
 
 // Route
 const indexRoute = require('./routes/index');
@@ -22,7 +24,7 @@ mongoose.connect('mongodb://localhost:27017/notes-app',{
 }).catch(err => console.log(err));
 mongoose.set('strictQuery', false);
 
-
+app.use(cookieParser('secretKey'));
 // Handling routes
 app.use('/', indexRoute);
 app.use('/notes', notesRoute);

@@ -80,6 +80,12 @@ module.exports.loginUserController = async(req, res) => {
         if(!user) return res.status(400).send('Login failed!');
         const isLogedIn = bcrypt.compare(password,user.password);
         if(!isLogedIn) return res.status(400).send('Login failed!');
+        // generate token
+        const token = user.generateAuthToken();
+        // send as header
+        // res.header('x-auth-token',token);
+        res.cookie('auth',token, {httpOnly:true, sameSite: true, maxAge:4*60*60*1000, signed: true})
+
         res.send('Success');
 
     }catch(err){
