@@ -1,5 +1,6 @@
 const {validationResult} = require('express-validator');
 const User = require("../models/users");
+const bcrypt = require('bcryptjs');
 
 // add User
 module.exports.addUserController = async(req, res) => {
@@ -69,5 +70,21 @@ module.exports.deleteUserController = 	async (req, res) => {
 	}else{
 		res.send(user);
 	}
+}
+
+// Login
+module.exports.loginUserController = async(req, res) => {
+    const {email, password} = req.body;
+    try{
+        const user = await User.findOne({email:email});
+        if(!user) return res.status(400).send('Login failed!');
+        const isLogedIn = bcrypt.compare(password,user.password);
+        if(!isLogedIn) return res.status(400).send('Login failed!');
+        res.send('Success');
+
+    }catch(err){
+        res.status(500).send(err);
+    }
+
 }
 
