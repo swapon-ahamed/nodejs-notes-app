@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const mongoose = require('mongoose');
+const connectionDb = require('./db/database')
 const {validationResult} = require('express-validator');
 const cookieParser = require('cookie-parser');
 
@@ -17,12 +17,7 @@ const notesRoute = require('./routes/notes');
 const usersRoute = require('./routes/users');
 
 // connecting database
-mongoose.connect('mongodb://localhost:27017/notes-app',{
-	useNewUrlParser: false
-}).then(() => {
-	console.log("Database connected successfully");
-}).catch(err => console.log(err));
-mongoose.set('strictQuery', false);
+connectionDb();
 
 app.use(cookieParser('secretKey'));
 // Handling routes
