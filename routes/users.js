@@ -1,23 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const {check} = require('express-validator');
+const {auth} = require('../middleware/auth');
 const {
     addUserController,
     getAllUserController,
     getUserController,
     updateUserController,
     deleteUserController,
-    loginUserController
+    loginUserController,
+    logoutUserController
     } = require('../controllers/userController');
 
 // get all users
 router.get('/', getAllUserController);
 
 // get single user
-router.get('/:id', getUserController);
+router.get('/me', auth, getUserController);
 
+// add user
 router.post('/', 
-    [
+    [   
+        auth,
         check('firstName', 'First name is required').notEmpty(),
         check('lastName', 'Last name is required').notEmpty(),
         check('email', 'Email is required').notEmpty(),
@@ -42,6 +46,7 @@ router.post('/',
 // update users
 router.put('/:id', 
 [
+    auth,
 	check('id','Not found note').isMongoId(),
 	check('firstName', 'first name is rquired').optional().notEmpty(),
 	check('lastName', 'last name is rquired').optional().notEmpty()
@@ -51,10 +56,13 @@ updateUserController
 
 // delete user
 router.delete('/:id', 
-	check('id', 'Note not found').isMongoId(),
+    [   auth,
+	    check('id', 'Note not found').isMongoId()
+    ],
 	deleteUserController
 );
 
 router.post("/login",loginUserController);
+router.get("/logout",auth, logoutUserController);
 
 module.exports = router;

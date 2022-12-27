@@ -1,5 +1,6 @@
 const {validationResult} = require('express-validator');
 const Note = require("../models/notes");
+const jwt = require('jsonwebtoken');
 
 // add note
 module.exports.addNoteController = async(req, res) => {
@@ -19,7 +20,7 @@ module.exports.addNoteController = async(req, res) => {
 
 // get all notes
 module.exports.getNotesController = async(req, res) => {
-	// res.send(notes);
+	console.log(req.user)
 	try{
 		const notes = await Note.find();
 		res.send(notes);

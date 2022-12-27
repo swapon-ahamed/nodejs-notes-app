@@ -2,8 +2,11 @@ const express = require('express');
 const router = express.Router();
 const {addNoteController,getNoteController,getNotesController,updateNoteController,deleteNoteController} = require("../controllers/noteController");
 const {check} = require('express-validator');
+//middle ware
+const {auth} = require('../middleware/auth')
+
 //home page
-// router.get("/", getNotesController);
+// router.get("/", auth,getNotesController);
 
 // get for all notes
 // router.get("/",getNotesController);
@@ -21,6 +24,7 @@ router.post('/',
 	[
 		// check('title').notEmpty().withMessage('Title is required').isLength({min: 3, max: 255}).withMessage('Title is required and must 3 to 255 characters.'),
 		// check('description').notEmpty().isLength({min: 3, max: 512}).withMessage('Description is required and must 3 to 512 characters.'),
+		auth,
 		check('title', 'Title is rquired').notEmpty(),
 		check('description', 'description is rquired').notEmpty()
 	],
@@ -31,6 +35,7 @@ router.post('/',
 // update notes
 router.put('/:id', 
 [
+	auth,
 	check('id','Not found note').isMongoId(),
 	check('title', 'Title is rquired').notEmpty(),
 	check('description', 'description is rquired').optional().notEmpty()
@@ -42,7 +47,9 @@ updateNoteController
 
 // delete note
 router.delete('/:id', 
-	check('id', 'Note not found').isMongoId(),
+	[	auth,
+		check('id', 'Note not found').isMongoId()
+	],
 	deleteNoteController
 );
 

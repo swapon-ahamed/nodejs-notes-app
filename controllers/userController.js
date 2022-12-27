@@ -31,8 +31,8 @@ module.exports.getAllUserController = async(req, res) => {
 
 // get single user 
 module.exports.getUserController = async(req, res) => {
+    const id = req.user._id;
     try{
-        const id = req.params.id;
         const users = await User.findById(id, ['-password']);
         if(!users) return res.status(404).send('User ID not found');
         res.send(users);
@@ -85,7 +85,6 @@ module.exports.loginUserController = async(req, res) => {
         // send as header
         // res.header('x-auth-token',token);
         res.cookie('auth',token, {httpOnly:true, sameSite: true, maxAge:4*60*60*1000, signed: true})
-
         res.send('Success');
 
     }catch(err){
@@ -93,4 +92,17 @@ module.exports.loginUserController = async(req, res) => {
     }
 
 }
+
+// Logout
+module.exports.logoutUserController = async(req, res) => {
+    try{
+        res.clearCookie('auth');
+        res.send('Loged out');
+    }catch(err){
+        res.status(500).send(err);
+    }
+
+}
+
+
 

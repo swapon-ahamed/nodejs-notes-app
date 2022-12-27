@@ -1,6 +1,9 @@
 const express = require('express');
 const app = express();
-const connectionDb = require('./db/database')
+const connectionDb = require('./db/database');
+
+//Middleware
+const {auth} = require('./middleware/auth');
 const {validationResult} = require('express-validator');
 const cookieParser = require('cookie-parser');
 
